@@ -3,6 +3,10 @@ bin/
 obj/
 out/
 
+# Ignore bin and obj directories
+backend/BackendAPI/bin/
+backend/BackendAPI/obj/
+
 # User-specific files
 .idea/
 .vs/
