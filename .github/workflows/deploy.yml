@@ -1,0 +1,46 @@
+name: Deploy to AWS S3
+
+on:
+  push:
+    branches:
+      - main  # Trigger the action on every push to the `main` branch (adjust for your branch)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Set up Node.js (adjust version if needed)
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.12.1' 
+
+      # Install dependencies (navigate to the frontend folder)
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+
+      # Build the Angular app (in the frontend folder)
+      - name: Build the app
+        run: |
+          cd frontend
+          npm run build -- --configuration production
+
+      # Set up AWS credentials (use GitHub secrets to securely store AWS keys)
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1 
+
+      # Deploy to S3
+      - name: Deploy to S3
+        run: |
+          aws s3 sync ./frontend/dist/aws-test-app/ s3://chovhan-test-angular-app-bucket --delete
